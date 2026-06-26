@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Vanessa Vasconcelos - Hair Stylist Premium</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Especialista em mechas, morenas iluminadas, cortes modernos e tratamentos capilares de alta performance. Agende seu horário no Studio Vanessa Vasconcelos.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --color-bg-primary: #FAF6F0; /* Creme acetinado luxuoso */
+            --color-bg-secondary: #F4EFE6; /* Bege suave */
+            --color-accent: #C5A880; /* Dourado champanhe */
+            --color-accent-hover: #B3956D;
+            --color-text-main: #2D2520; /* Marrom escuro café */
+            --color-text-muted: #6E6157; /* Marrom acinzentado suave */
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --shadow-premium: 0 15px 35px rgba(45, 37, 32, 0.08);
+            --shadow-hover: 0 20px 45px rgba(45, 37, 32, 0.15);
+        }
+
+        body {
+            background-color: var(--color-bg-primary);
+            font-family: var(--font-sans);
+            color: var(--color-text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Navbar Premium */
+        .navbar-premium {
+            background: rgba(250, 246, 240, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(197, 168, 128, 0.15);
+            padding: 18px 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand-premium {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: var(--color-text-main) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand-premium span {
+            color: var(--color-accent);
+        }
+
+        .nav-link-premium {
+            color: var(--color-text-main) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 16px !important;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link-premium::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-accent);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link-premium:hover::after {
+            width: 60%;
+        }
+
+        .nav-link-premium:hover {
+            color: var(--color-accent) !important;
+        }
+
+        /* Hero Split Section */
+        .hero-split {
+            min-height: 90vh;
+            padding: 120px 0 80px 0;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-content {
+            padding-right: 30px;
+        }
+
+        .hero-tagline {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--color-text-main);
+            margin-bottom: 25px;
+        }
+
+        .hero-title span {
+            font-style: italic;
+            color: var(--color-accent);
+            font-weight: 400;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        /* Premium Buttons */
+        .btn-premium {
+            background: linear-gradient(135deg, var(--color-accent), #d4bda0);
+            color: white !important;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            padding: 16px 38px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(197, 168, 128, 0.35);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #b89a71, var(--color-accent));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            border-radius: 50px;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(197, 168, 128, 0.5);
+        }
+
+        .btn-premium:hover::before {
+            opacity: 1;
+        }
+
+        .btn-premium-outline {
+            background: transparent;
+            color: var(--color-text-main) !important;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            padding: 15px 36px;
+            border-radius: 50px;
+            border: 2px solid var(--color-accent);
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-premium-outline:hover {
+            background-color: var(--color-accent);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(197, 168, 128, 0.2);
+        }
+
+        /* Image Art Frame (Destaque para o logo.png) */
+        .image-frame-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* O círculo dourado de fundo */
+        .image-frame-backdrop {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            background: rgba(197, 168, 128, 0.12);
+            z-index: 1;
+            animation: morphing-bg 12s infinite alternate ease-in-out;
+        }
+
+        .image-frame {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 16/9;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-premium);
+            border: 1px solid rgba(197, 168, 128, 0.2);
+            background-color: #fff;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+        }
+
+        .image-frame:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.03);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(197, 168, 128, 0.4);
+        }
+
+        .image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .image-frame:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Animação fluida do fundo */
+        @keyframes morphing-bg {
+            0% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+            50% {
+                border-radius: 40% 60% 50% 50% / 50% 60% 40% 60%;
+            }
+            100% {
+                border-radius: 50% 50% 60% 40% / 60% 40% 60% 50%;
+            }
+        }
+
+        /* Services Section (Cards) */
+        .services-section {
+            padding: 100px 0;
+            background-color: var(--color-bg-secondary);
+            border-top: 1px solid rgba(197, 168, 128, 0.1);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--color-text-main);
+        }
+
+        .service-card {
+            background-color: #fff;
+            border: 1px solid rgba(197, 168, 128, 0.1);
+            border-radius: 15px;
+            padding: 40px 30px;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(45, 37, 32, 0.03);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-accent), #e3d2bf);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-premium);
+            border-color: rgba(197, 168, 128, 0.25);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--color-bg-primary);
+            color: var(--color-accent);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            transition: all 0.4s ease;
+        }
+
+        .service-card:hover .service-icon-box {
+            background-color: var(--color-accent);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .service-card h3 {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--color-text-main);
+        }
+
+        .service-card p {
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
+            font-weight: 300;
+        }
+
+        /* Footer Elegant */
+        .footer-premium {
+            background-color: var(--color-text-main);
+            color: #E6DFD9;
+            padding: 80px 0 30px 0;
+            border-top: 2px solid var(--color-accent);
+        }
+
+        .footer-brand {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-brand span {
+            color: var(--color-accent);
+        }
+
+        .footer-desc {
+            color: #A3968B;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        .footer-hours-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-hours-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 1px;
+            background-color: var(--color-accent);
+        }
+
+        .footer-hours-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-hours-list li {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            color: #CFC5BC;
+        }
+
+        .footer-hours-list li span {
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+            color: #8C7F74;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #E6DFD9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+            transform: translateY(-3px);
+        }
+
+        /* Responsividade */
+        @media (max-width: 991px) {
+            .hero-split {
+                padding-top: 140px;
+                padding-bottom: 60px;
+            }
+            .hero-content {
+                padding-right: 0;
+                text-align: center;
+                margin-bottom: 60px;
+            }
+            .hero-title {
+                font-size: 3rem;
+            }
+            .image-frame-container {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .hero-title {
+                font-size: 2.3rem;
+            }
+            .btn-premium {
+                width: 100%;
+                justify-content: center;
+            }
+            .btn-premium-outline {
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Premium -->
+    <nav class="navbar navbar-expand-lg navbar-premium sticky-top">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-premium" href="#">
+                <span>VV</span> Studio Hair
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="#">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="#servicos">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="#contato">Contato</a>
+                    </li>
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <a href="/agendar" class="btn btn-premium py-2.5 px-4 shadow-sm" style="font-size: 0.85rem; padding: 10px 24px;">Agendar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Split -->
+    <header class="hero-split">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Coluna de Texto -->
+                <div class="col-lg-6 order-2 order-lg-1">
+                    <div class="hero-content">
+                        <span class="hero-tagline">Hair Stylist & Elegância</span>
+                        <h1 class="hero-title">Revele a sua <span>melhor versão</span>.</h1>
+                        <p class="hero-desc">Seja bem-vinda ao Studio Vanessa Vasconcelos. Um espaço exclusivo dedicado a realçar a sua beleza natural com sofisticação, especialista em mechas personalizadas e cortes modernos que contam a sua história.</p>
+                        <div class="d-sm-flex gap-3">
+                            <a href="/agendar" id="btn-hero-agendar" class="btn btn-premium">
+                                Agendar Horário <i class="fa-solid fa-calendar-days"></i>
+                            </a>
+                            <a href="#servicos" class="btn btn-premium-outline">
+                                Ver Serviços <i class="fa-solid fa-circle-chevron-down"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coluna da Foto do Logo em Destaque Artístico -->
+                <div class="col-lg-6 order-1 order-lg-2 mb-5 mb-lg-0">
+                    <div class="image-frame-container">
+                        <div class="image-frame-backdrop"></div>
+                        <div class="image-frame">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Studio Hair Vanessa Vasconcelos Logo Plaque" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Seção de Serviços -->
+    <section class="services-section" id="servicos">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">O que fazemos de melhor</span>
+                <h2 class="section-title">Nossos Serviços</h2>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Serviço 1: Cortes -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="service-card">
+                        <div class="service-icon-box">
+                            <i class="fa-solid fa-scissors"></i>
+                        </div>
+                        <h3>Cortes</h3>
+                        <p>Estilos sob medida, modernos e clássicos projetados especialmente para valorizar o formato do seu rosto e o seu estilo.</p>
+                    </div>
+                </div>
+
+                <!-- Serviço 2: Coloração -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="service-card">
+                        <div class="service-icon-box">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <h3>Coloração</h3>
+                        <p>Retoques e coloração total com produtos selecionados de alta qualidade que protegem e garantem brilho intenso aos fios.</p>
+                    </div>
+                </div>
+
+                <!-- Serviço 3: Mechas -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="service-card">
+                        <div class="service-icon-box">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h3>Mechas</h3>
+                        <p>Especialista em loiros e morenas iluminadas. Técnicas exclusivas para uma transição suave, natural e radiante.</p>
+                    </div>
+                </div>
+
+                <!-- Serviço 4: Hidratação -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="service-card">
+                        <div class="service-icon-box">
+                            <i class="fa-solid fa-sparkles"></i>
+                        </div>
+                        <h3>Tratamentos</h3>
+                        <p>Hidratações profundas e vaporizador capilar de última tecnologia para reconstruir, nutrir e devolver a vida ao seu cabelo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Elegant -->
+    <footer class="footer-premium" id="contato">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="footer-brand"><span>VV</span> Studio Hair</div>
+                    <p class="footer-desc">Um conceito de beleza diferenciado, onde cada detalhe é planejado para proporcionar uma experiência inesquecível e um atendimento de alto padrão.</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/studio_vanessa27/" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 offset-lg-1">
+                    <h4 class="footer-hours-title">Atendimento</h4>
+                    <ul class="footer-hours-list">
+                        <li>Segunda a Sábado <span>09:00 - 19:00</span></li>
+                        <li>Domingo <span>Fechado</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <h4 class="footer-hours-title">Onde Estamos</h4>
+                    <p class="footer-desc" style="margin-bottom: 10px;">
+                        <i class="fa-solid fa-location-dot text-accent" style="color: var(--color-accent); margin-right: 8px;"></i>
+                        Rua Isabel Alves Siqueira, 852<br>Castilho - SP, 16920-178
+                    </p>
+                    <p class="footer-desc">
+                        <i class="fa-brands fa-instagram" style="color: var(--color-accent); margin-right: 8px;"></i>
+                        <a href="https://www.instagram.com/studio_vanessa27/" target="_blank" rel="noopener noreferrer" style="color: #CFC5BC; text-decoration: none;">@studio_vanessa27</a>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; 2026 Studio Vanessa Vasconcelos. Todos os direitos reservados.</p>
+                <p class="mb-0">Desenvolvido com sofisticação</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

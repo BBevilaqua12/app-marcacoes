@@ -1,0 +1,16 @@
+{
+  "name": "bot-whatsapp-salao",
+  "version": "1.0.0",
+  "description": "Bot WhatsApp via Baileys — notificações e consulta de agenda para o salão",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "baileys": "^6.7.16",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pino": "^9.6.0"
+  }
+}

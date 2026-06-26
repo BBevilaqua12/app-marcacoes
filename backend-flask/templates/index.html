@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento | Vanessa Vasconcelos</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #fdf6f6;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-form {
+            background-color: #d4a373;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .btn-confirmar {
+            background-color: #d4a373;
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #bc8a5f;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        /* --- Estilização Premium Calendário & Slots --- */
+        .flatpickr-calendar.inline {
+            box-shadow: 0 5px 20px rgba(212, 163, 115, 0.12);
+            border: 1px solid #faedcd;
+            border-radius: 15px;
+            background: #fff;
+            margin: 0 auto 20px auto;
+        }
+
+        .flatpickr-day.selected, 
+        .flatpickr-day.selected:hover {
+            background: #d4a373 !important;
+            border-color: #d4a373 !important;
+            color: #fff !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: #bc8a5f !important;
+        }
+
+        .flatpickr-day.today:hover {
+            background: #e9ecef !important;
+        }
+
+        .slot-btn {
+            border: 1px solid #faedcd;
+            background-color: #fff;
+            color: #495057;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 45px;
+        }
+
+        .slot-btn:hover:not(.disabled) {
+            background-color: #faedcd;
+            border-color: #d4a373;
+            color: #bc8a5f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(212, 163, 115, 0.2);
+        }
+
+        .slot-btn.selected {
+            background-color: #d4a373 !important;
+            border-color: #d4a373 !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.4);
+            transform: scale(1.03);
+        }
+
+        .slot-btn.disabled {
+            background-color: #f8f9fa;
+            color: #ced4da;
+            border-color: #e9ecef;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="header-form">
+                        <h2 class="fw-bold">Agende sua Beleza</h2>
+                        <p class="mb-0 small">Segunda a Sábado — 09h às 19h</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/enviar_agendamento" method="POST">
+                            {% if erro %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ erro }}
+                            </div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nome Completo</label>
+                                <input type="text" name="nome" class="form-control" placeholder="Ex: Maria Silva"
+                                    value="{{ nome | default('') }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">WhatsApp</label>
+                                <input type="text" id="whatsapp" name="whatsapp" class="form-control" placeholder="Ex: (11) 9 9999-9999"
+                                    value="{{ whatsapp | default('') }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Escolha o Serviço</label>
+                                <select name="servico_id" id="servico" class="form-control" required>
+                                    <option value="">Selecione um serviço...</option>
+                                </select>
+                                <small class="text-muted d-block mt-2" id="servico_info"></small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold d-block text-center mb-3">Escolha o Dia</label>
+                                <div id="calendario-inline"></div>
+                                <input type="hidden" id="data_hora" name="data_hora" value="{{ data_hora | default('') }}" required>
+                            </div>
+
+                            <div class="mb-4 d-none" id="secao-horarios">
+                                <label class="form-label fw-bold d-block text-center mb-3">Escolha o Horário</label>
+                                <div id="grid-horarios" class="row row-cols-3 g-2 px-2">
+                                    <!-- Os horários serão gerados aqui dinamicamente -->
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-confirmar w-100 text-white">Confirmar
+                                Agendamento</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script src="https://unpkg.com/imask"></script>
+
+    <script>
+        // Dados dos serviços (passados do backend)
+        const SERVICOS = JSON.parse('{{ servicos_json | safe }}');
+
+        // Variáveis para controlar o calendário e agendamentos
+        let servicoSelecionado = false;
+        let duracao_minutos = 0;
+        let dataSelecionada = null;
+        let agendamentosOcupados = [];
+        let calendarInstance = null;
+
+        // Preencher dropdown de serviços
+        function preencherServicos() {
+            const selectServico = document.getElementById('servico');
+            // Limpa opções antigas exceto a primeira
+            selectServico.innerHTML = '<option value="">Selecione um serviço...</option>';
+
+            for (const [id, dados] of Object.entries(SERVICOS)) {
+                const option = document.createElement('option');
+                option.value = id;
+                const duracao = dados.duracao_minutos;
+                const horas = Math.floor(duracao / 60);
+                const minutos = duracao % 60;
+                const duracao_str = horas > 0 ? (minutos > 0 ? `${horas}h${minutos}m` : `${horas}h`) : `${minutos}m`;
+                option.textContent = `${dados.nome} - R$ ${dados.preco.toFixed(2)} (${duracao_str})`;
+                selectServico.appendChild(option);
+            }
+        }
+
+        // Atualizar informações do serviço selecionado
+        function atualizarServico() {
+            const selectServico = document.getElementById('servico');
+            const servico_id = selectServico.value;
+            const infoDiv = document.getElementById('servico_info');
+
+            if (!servico_id) {
+                infoDiv.textContent = '';
+                duracao_minutos = 0;
+                servicoSelecionado = false;
+                gerarGridHorarios(); // Oculta a seção de horários
+                return;
+            }
+
+            const servico = SERVICOS[servico_id];
+            duracao_minutos = servico.duracao_minutos;
+
+            const horas = Math.floor(duracao_minutos / 60);
+            const minutos = duracao_minutos % 60;
+            const duracao_str = horas > 0 ? (minutos > 0 ? `${horas}h${minutos}m` : `${horas}h`) : `${minutos}m`;
+
+            infoDiv.innerHTML = `<strong>Duração estimada:</strong> ${duracao_str} | <strong>Preço:</strong> R$ ${servico.preco.toFixed(2)}`;
+            servicoSelecionado = true;
+
+            // Atualiza grid de horários com base na nova duração
+            gerarGridHorarios();
+        }
+
+        // Buscar agendamentos ocupados da API
+        async function buscarHorariosOcupados() {
+            try {
+                const response = await fetch('/api/agendamentos');
+                if (response.ok) {
+                    agendamentosOcupados = await response.json();
+                } else {
+                    console.error('Erro ao buscar agendamentos:', response.statusText);
+                    agendamentosOcupados = [];
+                }
+            } catch (error) {
+                console.error('Erro de conexão ao buscar agendamentos:', error);
+                agendamentosOcupados = [];
+            }
+        }
+
+        // Função para verificar se há conflito de horários (frontend)
+        function verificarConflitoFrontend(slotInicioStr, duracaoMinutos) {
+            const dtInicio = new Date(slotInicioStr.replace(' ', 'T'));
+            const dtFim = new Date(dtInicio.getTime() + duracaoMinutos * 60 * 1000);
+
+            // Horário de funcionamento limite (19:00)
+            const limiteFim = new Date(slotInicioStr.replace(' ', 'T'));
+            limiteFim.setHours(19, 0, 0, 0);
+
+            // Não permite finalizar após as 19:00
+            if (dtFim > limiteFim) {
+                return true;
+            }
+
+            // Verificar sobreposição com cada agendamento ocupado
+            for (const a of agendamentosOcupados) {
+                const aInicio = new Date(a.data_hora_inicio.replace(' ', 'T'));
+                const aFim = new Date(aInicio.getTime() + a.duracao_minutos * 60 * 1000);
+
+                // Sobreposição: dtInicio < aFim e aInicio < dtFim
+                if (dtInicio < aFim && aInicio < dtFim) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Gerar grid de botões de horários (09:00 às 19:00)
+        function gerarGridHorarios() {
+            const grid = document.getElementById('grid-horarios');
+            const secao = document.getElementById('secao-horarios');
+            const inputDataHora = document.getElementById('data_hora');
+
+            grid.innerHTML = ''; // Limpa slots anteriores
+            inputDataHora.value = ''; // Reseta valor no form
+
+            if (!dataSelecionada || !servicoSelecionado || duracao_minutos === 0) {
+                secao.classList.add('d-none');
+                return;
+            }
+
+            secao.classList.remove('d-none');
+
+            const horaInicioBase = 9;
+            const horaFimBase = 19;
+
+            for (let hora = horaInicioBase; hora < horaFimBase; hora++) {
+                for (const minuto of [0, 30]) {
+                    const horaStr = String(hora).padStart(2, '0');
+                    const minStr = String(minuto).padStart(2, '0');
+                    const horarioStr = `${horaStr}:${minStr}`;
+
+                    const slotInicioStr = `${dataSelecionada} ${horarioStr}`;
+                    const slotDateObj = new Date(slotInicioStr.replace(' ', 'T'));
+
+                    // Evita agendar no passado
+                    const agora = new Date();
+                    const noPassado = slotDateObj < agora;
+
+                    // Calcula disponibilidade
+                    const conflito = noPassado || verificarConflitoFrontend(slotInicioStr, duracao_minutos);
+
+                    // Criar coluna e botão
+                    const col = document.createElement('div');
+                    col.className = 'col';
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `btn slot-btn w-100 ${conflito ? 'disabled' : ''}`;
+                    btn.textContent = horarioStr;
+                    btn.disabled = conflito;
+                    btn.dataset.completo = slotInicioStr;
+
+                    if (!conflito) {
+                        btn.addEventListener('click', function() {
+                            // Deseleciona anteriores
+                            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+                            // Seleciona o atual
+                            btn.classList.add('selected');
+                            // Salva no input do formulário
+                            inputDataHora.value = slotInicioStr;
+                        });
+                    }
+
+                    col.appendChild(btn);
+                    grid.appendChild(col);
+                }
+            }
+        }
+
+        // Configuração do Calendário Inline
+        function inicializarCalendario() {
+            calendarInstance = flatpickr("#calendario-inline", {
+                inline: true,
+                minDate: "today",
+                locale: "pt",
+                dateFormat: "Y-m-d",
+                disable: [
+                    function(date) {
+                        // Bloqueia Domingo (0 = domingo)
+                        return date.getDay() === 0;
+                    }
+                ],
+                onChange: async function(selectedDates, dateStr, instance) {
+                    dataSelecionada = dateStr;
+                    // Recarrega ocupações atualizadas ao mudar a data para garantir consistência
+                    await buscarHorariosOcupados();
+                    gerarGridHorarios();
+                }
+            });
+        }
+
+        // Inicializar componentes ao carregar a página
+        document.addEventListener('DOMContentLoaded', async function() {
+            preencherServicos();
+            inicializarCalendario();
+            await buscarHorariosOcupados();
+
+            // Configuração da Máscara de WhatsApp (Padrão brasileiro: (11) 9 9999-9999)
+            IMask(document.getElementById('whatsapp'), {
+                mask: '(00) 0 0000-0000'
+            });
+
+            // Event listener para mudanças no serviço
+            document.getElementById('servico').addEventListener('change', atualizarServico);
+
+            // Validação customizada no envio do formulário
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const selectServico = document.getElementById('servico').value;
+                const dataHoraVal = document.getElementById('data_hora').value;
+
+                if (!selectServico) {
+                    alert('❌ Por favor, selecione um serviço primeiro.');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (!dataHoraVal) {
+                    alert('❌ Por favor, escolha um dia e horário no calendário.');
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

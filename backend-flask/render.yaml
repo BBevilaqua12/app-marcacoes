@@ -1,0 +1,25 @@
+# ============================================================================
+# Render Blueprint — Deploy automático do backend Flask
+# ============================================================================
+# Para usar: conecte o repositório no Render e ele detecta este arquivo.
+# As env vars devem ser configuradas manualmente no Dashboard do Render.
+# ============================================================================
+
+services:
+  - type: web
+    name: salao-vanessa-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend-flask
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FIREBASE_CREDENTIALS
+        sync: false   # Configurar manualmente no Dashboard (é secreto)
+      - key: BAILEYS_URL
+        sync: false   # URL do túnel para o bot local
+      - key: NUMERO_DONA
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11.7"
