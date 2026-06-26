@@ -19,6 +19,38 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// --- Proteção contra quedas do bot (Erros internos do WhatsApp/libsignal) ---
+process.on('uncaughtException', (err) => { });
+process.on('unhandledRejection', (reason, promise) => { });
+
+// ============================================================================
+// 🛡️ ESCUDO DE PRIVACIDADE DO TERMINAL
+// ============================================================================
+// Intercepta todos os logs do Node.js e bloqueia TUDO que não for do nosso bot.
+// Isso impede que a biblioteca libsignal vaze mensagens privadas no terminal
+// quando ocorrerem erros de criptografia.
+const consoleLogOriginal = console.log;
+const consoleErrorOriginal = console.error;
+const consoleWarnOriginal = console.warn;
+
+function filtroDePrivacidade(args, logFunction) {
+    if (!args || args.length === 0) return logFunction(...args);
+    const texto = String(args[0]);
+    
+    // Lista de prefixos que NÓS usamos nos nossos logs.
+    // Qualquer coisa fora disso é lixo da biblioteca e será silenciado.
+    const permitidos = ['✅', '🚀', '📱', '🔑', '🔗', '👉', '📤', '📨', '⚠️  Sessão', '🔄', ''];
+    
+    if (permitidos.some(prefixo => texto.startsWith(prefixo))) {
+        logFunction(...args);
+    }
+}
+
+console.log = (...args) => filtroDePrivacidade(args, consoleLogOriginal);
+console.error = (...args) => filtroDePrivacidade(args, consoleErrorOriginal);
+console.warn = (...args) => filtroDePrivacidade(args, consoleWarnOriginal);
+// ============================================================================
+
 // --- Configuração de Diretórios ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -144,18 +176,22 @@ async function processarMensagemRecebida(mensagem) {
     if (mensagem.key.remoteJid.includes('@g.us')) return;
     if (mensagem.key.remoteJid === 'status@broadcast') return;
 
-    // Extrai o número da conversa (remoteJid)
-    const remetenteJid = mensagem.key.remoteJid;
-    // Tira o sufixo para ter apenas o número
-    const numeroConversa = remetenteJid.split('@')[0].split(':')[0];
+    // ⚠️ SÓ DEVE RESPONDER SE A CONVERSA FOR O CHAT "VOCÊ" (ELA COM ELA MESMA)
+    // Extrai o número do próprio celular que está conectado no bot
+    const meuNumeroLocal = sock?.user?.id?.split(':')[0];
+    
+    // Se por acaso o socket ainda não carregou o user, cai fora por segurança
+    if (!meuNumeroLocal) return;
 
-    // ⚠️ SÓ DEVE RESPONDER SE A CONVERSA FOR COM ELA MESMA (CHAT "VOCÊ")
-    // Aceita o número dela ou o identificador interno (LID) gerado pelo próprio celular
-    const isLidInterno = remetenteJid.includes('@lid') && mensagem.key.fromMe;
-    const isNumeroDela = numeroConversa === NUMERO_DONA || numeroConversa === (sock?.user?.id?.split(':')[0]);
+    // Lista estrita: APENAS o chat dela com ela mesma é permitido para comandos.
+    // O NUMERO_DONA do .env agora serve apenas para receber notificações do site, não para enviar comandos.
+    const chatsPermitidos = [
+        `${meuNumeroLocal}@s.whatsapp.net`
+    ];
 
-    if (!isLidInterno && !isNumeroDela) {
-        return; // Ignora silenciosamente mensagens trocadas com clientes
+    // RETURN IMEDIATO: Se não for o chat com o próprio número dela, ignora.
+    if (!chatsPermitidos.includes(mensagem.key.remoteJid)) {
+        return; 
     }
 
     // Extrai o texto da mensagem
@@ -166,17 +202,15 @@ async function processarMensagemRecebida(mensagem) {
     if (!texto) return;
 
     const textoLower = texto.trim().toLowerCase();
-    
-    // Ignora as respostas do próprio bot (para não entrar em loop caso o texto bata com algum comando sem querer)
-    // Se a mensagem contiver o emoji de robô ou os menus, ignora.
+    // Ignora as respostas do próprio bot
     if (texto.includes('🤖') || texto.includes('📋') || texto.includes('📭')) return;
 
-    console.log(`📨 Comando recebido no chat da dona: "${texto}"`);
-
     let resposta = null;
+    let comandoValido = false;
 
     // --- Comando: AGENDA ou HOJE ---
     if (['agenda', 'hoje', 'marcações', 'marcacoes', 'agendamentos'].includes(textoLower)) {
+        comandoValido = true;
         const hoje = getHoje();
         const agendamentos = await buscarAgendamentosPorData(hoje);
         const [ano, mes, dia] = hoje.split('-');
@@ -184,6 +218,7 @@ async function processarMensagemRecebida(mensagem) {
     }
     // --- Comando: AMANHÃ ---
     else if (['amanha', 'amanhã'].includes(textoLower)) {
+        comandoValido = true;
         const amanha = getAmanha();
         const agendamentos = await buscarAgendamentosPorData(amanha);
         const [ano, mes, dia] = amanha.split('-');
@@ -191,11 +226,13 @@ async function processarMensagemRecebida(mensagem) {
     }
     // --- Comando: SEMANA ---
     else if (['semana', 'próximos', 'proximos', 'próximos dias', 'proximos dias'].includes(textoLower)) {
+        comandoValido = true;
         const agendamentos = await buscarProximosAgendamentos();
         resposta = formatarListaAgendamentos(agendamentos, 'Próximos 7 Dias');
     }
     // --- Comando: AJUDA ou MENU ---
     else if (['ajuda', 'menu', 'comandos', 'help', '?'].includes(textoLower)) {
+        comandoValido = true;
         resposta = (
             `🤖 *Comandos Disponíveis*\n`
             + `━━━━━━━━━━━━━━━━━\n\n`
@@ -208,13 +245,14 @@ async function processarMensagemRecebida(mensagem) {
         );
     }
 
-    // Se gerou resposta, envia
-    if (resposta) {
+    // Se gerou resposta, loga o comando que foi reconhecido e envia a resposta
+    if (comandoValido) {
+        console.log(`📨 Comando RECONHECIDO no chat privado: "${texto}"`);
         try {
             await sock.sendMessage(remetenteJid, { text: resposta });
-            console.log(`📤 Resposta enviada para a dona`);
+            console.log(`📤 Resposta enviada com a agenda/menu`);
         } catch (erro) {
-            console.error(`❌ Erro ao responder a dona:`, erro.message);
+            console.error(`❌ Erro ao responder:`, erro.message);
         }
     }
 }
