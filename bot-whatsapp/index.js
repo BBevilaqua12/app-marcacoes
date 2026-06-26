@@ -15,10 +15,12 @@ import { fileURLToPath } from 'url';
 
 // --- Proteção contra quedas do bot (Erros internos) ---
 process.on('uncaughtException', (err) => { 
-    console.error('Uncaught Exception:', err.message);
+    if (typeof consoleErrorOriginal === 'function') consoleErrorOriginal('❌ Uncaught Exception:', err);
+    else console.error('❌ Uncaught Exception:', err);
 });
 process.on('unhandledRejection', (reason, promise) => { 
-    console.error('Unhandled Rejection:', reason);
+    if (typeof consoleErrorOriginal === 'function') consoleErrorOriginal('❌ Unhandled Rejection:', reason);
+    else console.error('❌ Unhandled Rejection:', reason);
 });
 
 // ============================================================================
