@@ -41,7 +41,7 @@ function filtroDePrivacidade(args, logFunction) {
     
     // Lista de prefixos que NÓS usamos nos nossos logs.
     // Qualquer coisa fora disso é lixo da biblioteca e será silenciado.
-    const permitidos = ['✅', '🚀', '📱', '🔑', '🔗', '👉', '📤', '📨', '⚠️  Sessão', '🔄', ''];
+    const permitidos = ['✅', '🚀', '📱', '🔑', '🔗', '👉', '📤', '📨', '⚠️  Sessão', '🔄', '❌', 'Error:', 'SyntaxError:', 'TypeError:', ''];
     
     if (permitidos.some(prefixo => texto.startsWith(prefixo))) {
         logFunction(...args);
@@ -262,24 +262,40 @@ async function processarMensagemRecebida(mensagem) {
 // ============================================================================
 // INICIALIZA FIREBASE ADMIN
 // ============================================================================
+// ============================================================================
+// INICIALIZA FIREBASE ADMIN
+// ============================================================================
 let firebaseCreds;
-if (process.env.FIREBASE_CREDENTIALS) {
-    firebaseCreds = JSON.parse(process.env.FIREBASE_CREDENTIALS);
-} else {
-    // Busca na raiz do projeto
-    const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
-    if (fs.existsSync(serviceAccountPath)) {
-        firebaseCreds = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+try {
+    if (process.env.FIREBASE_CREDENTIALS) {
+        firebaseCreds = JSON.parse(process.env.FIREBASE_CREDENTIALS);
     } else {
-        console.error('❌ ERRO: Arquivo serviceAccountKey.json não encontrado nem FIREBASE_CREDENTIALS configurada.');
-        process.exit(1);
+        // Busca na raiz do projeto
+        const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
+        if (fs.existsSync(serviceAccountPath)) {
+            firebaseCreds = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+        } else {
+            console.errorOriginal('❌ ERRO: Arquivo serviceAccountKey.json não encontrado nem FIREBASE_CREDENTIALS configurada.');
+            process.exit(1);
+        }
     }
+} catch (error) {
+    console.errorOriginal('\n❌ ERRO CRÍTICO AO LER O JSON DO FIREBASE:');
+    console.errorOriginal(error.message);
+    console.errorOriginal('\nVerifique se você colou o JSON corretamente no Render, sem aspas a mais no começo ou no fim, e sem quebras de linha erradas.\n');
+    process.exit(1);
 }
 
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(firebaseCreds)
-    });
+try {
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert(firebaseCreds)
+        });
+    }
+} catch (error) {
+    console.errorOriginal('\n❌ ERRO AO INICIALIZAR FIREBASE:');
+    console.errorOriginal(error.message);
+    process.exit(1);
 }
 const db = admin.firestore();
 
