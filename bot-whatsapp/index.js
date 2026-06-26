@@ -12,7 +12,9 @@
 
 import 'dotenv/config';
 import express from 'express';
-import { makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, Browsers } from 'baileys';
+import { makeWASocket, DisconnectReason, fetchLatestBaileysVersion, Browsers } from 'baileys';
+import { useFirestoreAuthState } from './useFirestoreAuthState.js';
+import admin from 'firebase-admin';
 import pino from 'pino';
 import { Boom } from '@hapi/boom';
 import fs from 'fs';
@@ -69,7 +71,7 @@ let conectado = false;
 
 const NUMERO_DONA = process.env.NUMERO_DONA || '';
 const FLASK_API_URL = process.env.FLASK_API_URL || 'http://localhost:5000';
-const PORTA = parseInt(process.env.PORTA || '3001', 10);
+const PORTA = parseInt(process.env.PORT || process.env.PORTA || '3001', 10);
 
 // JID formatado para o WhatsApp
 const JID_DONA = NUMERO_DONA + '@s.whatsapp.net';
@@ -258,11 +260,35 @@ async function processarMensagemRecebida(mensagem) {
 }
 
 // ============================================================================
+// INICIALIZA FIREBASE ADMIN
+// ============================================================================
+let firebaseCreds;
+if (process.env.FIREBASE_CREDENTIALS) {
+    firebaseCreds = JSON.parse(process.env.FIREBASE_CREDENTIALS);
+} else {
+    // Busca na raiz do projeto
+    const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
+    if (fs.existsSync(serviceAccountPath)) {
+        firebaseCreds = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+    } else {
+        console.error('❌ ERRO: Arquivo serviceAccountKey.json não encontrado nem FIREBASE_CREDENTIALS configurada.');
+        process.exit(1);
+    }
+}
+
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(firebaseCreds)
+    });
+}
+const db = admin.firestore();
+
+// ============================================================================
 // FUNÇÃO PRINCIPAL: Inicializa a conexão Baileys com Pairing Code
 // ============================================================================
 async function iniciarBaileys() {
-    // Carrega ou cria o estado de autenticação na pasta 'sessao_whatsapp'
-    const { state, saveCreds } = await useMultiFileAuthState(PASTA_SESSAO);
+    // Carrega ou cria o estado de autenticação no Firebase Firestore
+    const { state, saveCreds } = await useFirestoreAuthState(db, 'sessao_vanessa');
     const { version } = await fetchLatestBaileysVersion();
 
     sock = makeWASocket({
@@ -285,9 +311,10 @@ async function iniciarBaileys() {
             const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
 
             if (reason === DisconnectReason.loggedOut) {
-                console.log('⚠️  Sessão encerrada. Apagando credenciais e reiniciando...');
-                // Remove a pasta de sessão para forçar novo pareamento
-                fs.rmSync(PASTA_SESSAO, { recursive: true, force: true });
+                console.log('⚠️  Sessão encerrada. Apagando credenciais do Firebase e reiniciando...');
+                try {
+                    await db.collection('whatsapp_sessions').doc('sessao_vanessa').collection('auth').doc('creds').delete();
+                } catch(e) {}
                 await iniciarBaileys();
             } else {
                 console.log(`🔄 Desconectado (razão: ${reason}). Reconectando em 5s...`);
