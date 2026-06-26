@@ -8,6 +8,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
     "baileys": "^6.7.16",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
