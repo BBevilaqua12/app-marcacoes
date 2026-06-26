@@ -6,7 +6,8 @@ import 'dotenv/config';
 import express from 'express';
 import { makeWASocket, DisconnectReason, fetchLatestBaileysVersion, Browsers } from 'baileys';
 import { useFirestoreAuthState } from './useFirestoreAuthState.js';
-import admin from 'firebase-admin';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import pino from 'pino';
 import { Boom } from '@hapi/boom';
 import fs from 'fs';
@@ -196,9 +197,9 @@ try {
 }
 
 try {
-    if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(firebaseCreds)
+    if (getApps().length === 0) {
+        initializeApp({
+            credential: cert(firebaseCreds)
         });
     }
 } catch (error) {
@@ -207,7 +208,7 @@ try {
     process.exit(1);
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
 // ============================================================================
 // FUNÇÃO PRINCIPAL
