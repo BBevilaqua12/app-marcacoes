@@ -134,12 +134,13 @@ npm start
 
 ---
 
-## 🔐 Segurança
+## 🔐 Segurança e Privacidade
 
-- ✅ Credenciais Firebase via variável de ambiente (`FIREBASE_CREDENTIALS`)
-- ✅ Números de telefone via variável de ambiente
-- ✅ Arquivo `.gitignore` protege: `.env`, `serviceAccountKey.json`, `sessao_whatsapp/`, `node_modules/`, `venv/`
-- ✅ Arquivos `.env.example` documentam as variáveis sem expor valores reais
+- 🚫 **NUNCA COMMITE CHAVES DE ACESSO:** Arquivos como `.env` e `serviceAccountKey.json` **JAMAIS** devem ser enviados para o GitHub. Eles já estão listados no `.gitignore` por padrão.
+- ✅ **Variáveis de Ambiente:** Todas as credenciais (Firebase, números de telefone) rodam por variáveis de ambiente via Render.
+- 👁️ **Privacidade do Bot (Zero Leitura):** O bot ignora 100% de qualquer mensagem enviada por clientes, familiares ou grupos. Ele só reage a comandos do próprio número da dona, no chat com ela mesma. Nenhum dado de conversa é salvo.
+- 🛡️ **Proteção do Firebase:** A conexão é feita com credenciais administrativas fechadas (`FIREBASE_CREDENTIALS`), garantindo que apenas a aplicação acesse a chave da sessão do Baileys.
+- 📱 **Dica de Ouro:** É **altamente recomendado** manter a Confirmação em Duas Etapas (PIN) ativada no celular físico para proteção extra do chip/número.
 
 ---
 
